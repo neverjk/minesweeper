@@ -2,17 +2,17 @@
 #include <iostream>
 using namespace std;
 HANDLE hConsoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-char mines[SIZE][SIZE]; // масив генерується на початку гри
-char mns[SIZE][SIZE]; // масив, що виводиться на екран (в ньому ми граємо)
-char flags[SIZE][SIZE]; //  масив, що відповідає за флажки
+char mines[SIZE][SIZE]; // РјР°СЃРёРІ РіРµРЅРµСЂСѓС”С‚СЊСЃСЏ РЅР° РїРѕС‡Р°С‚РєСѓ РіСЂРё
+char mns[SIZE][SIZE]; // РјР°СЃРёРІ, С‰Рѕ РІРёРІРѕРґРёС‚СЊСЃСЏ РЅР° РµРєСЂР°РЅ (РІ РЅСЊРѕРјСѓ РјРё РіСЂР°С”РјРѕ)
+char flags[SIZE][SIZE]; //  РјР°СЃРёРІ, С‰Рѕ РІС–РґРїРѕРІС–РґР°С” Р·Р° С„Р»Р°Р¶РєРё
 int flags_num = (MINES_NUM);
-int pos_i = (SIZE / 2); // змінні, що відповідають за позицію в грі (управління клавішами)
+int pos_i = (SIZE / 2); // Р·РјС–РЅРЅС–, С‰Рѕ РІС–РґРїРѕРІС–РґР°СЋС‚СЊ Р·Р° РїРѕР·РёС†С–СЋ РІ РіСЂС– (СѓРїСЂР°РІР»С–РЅРЅСЏ РєР»Р°РІС–С€Р°РјРё)
 int pos_j = (SIZE / 2);
 bool first_game = true;
 bool saved_game = false;
 
 
-void setcur(int x, int y) //  функція для очищення консолі без миготіння
+void setcur(int x, int y) //  С„СѓРЅРєС†С–СЏ РґР»СЏ РѕС‡РёС‰РµРЅРЅСЏ РєРѕРЅСЃРѕР»С– Р±РµР· РјРёРіРѕС‚С–РЅРЅСЏ
 {
 	COORD coord;
 	coord.X = x;
@@ -21,13 +21,14 @@ void setcur(int x, int y) //  функція для очищення консолі без миготіння
 }
 void Game();
 void Menu() {
-	mciSendString("open \"use\\VECTOR_GRAPHICS_DESTINE.mp3\" type mpegvideo alias mp3", NULL, 0, NULL);
+	mciSendString("open \"use\\VECTOR_GRAPHICS_DESTINE.mp3\" type mpegvideo alias mp3", NULL, 0, NULL); // РјСѓР·РёРєР°
 	mciSendString("play mp3 from 0", NULL, 0, NULL);
 	Sleep(1);
 	system("cls");
 	SetConsoleTextAttribute(hConsoleHandle, 15);
 	int menu = 1;
 	cout << endl;
+	// РјРµРЅСЋ
 	cout << setw(40) << "MINESWEEPER" << endl;
 	cout << setw(40) << "> start new game\n";
 	cout << setw(30) << "exit\n";
@@ -40,6 +41,7 @@ void Menu() {
 		int push_int1;
 		push1 = _getch();
 
+		// РїРµСЂРµРјС–С‰РµРЅРЅСЏ РїРѕ РјРµРЅСЋ
 		push_int1 = static_cast<int>(push1);
 		switch (push_int1) {
 		case 72: {if (menu == 3)
@@ -54,6 +56,7 @@ void Menu() {
 				menu = 2;
 			break;
 		}
+		// РєР»Р°РІС–С€Р° enter
 		case 13: {
 			if (menu == 2) {
 				exit(0);
@@ -79,8 +82,14 @@ void Menu() {
 				cout << "\t use ESC key to return to the menu" << endl;
 				cout << "\t use SPACE or ENTER keys to open cell" << endl;
 				cout << "< back";
-				_getch();
-				PlaySound(".\\use\\FGBS(5).wav", NULL, SND_ASYNC);
+				while (1) {
+					char push = _getch();
+					int push_int = static_cast<int>(push);
+					if (push == 13) {
+						PlaySound(".\\use\\FGBS(9).wav", NULL, SND_ASYNC);
+						Menu();
+					}
+				}
 
 			}
 			break;
@@ -126,14 +135,14 @@ void Menu() {
 }
 void fullInStart() {
 
-	// початкове заповнення mns (x - невідкриті клітинки) і mines (. - пусті клітинки)
+	// РїРѕС‡Р°С‚РєРѕРІРµ Р·Р°РїРѕРІРЅРµРЅРЅСЏ mns (x - РЅРµРІС–РґРєСЂРёС‚С– РєР»С–С‚РёРЅРєРё) С– mines (. - РїСѓСЃС‚С– РєР»С–С‚РёРЅРєРё)
 	for (int i = 0; i < SIZE; i++) {
 		for (int j = 0; j < 9; j++) {
 			mns[i][j] = 'x';
 			mines[i][j] = '.';
 		}
 	}
-	// початкове заповнення масиву флажків
+	// РїРѕС‡Р°С‚РєРѕРІРµ Р·Р°РїРѕРІРЅРµРЅРЅСЏ РјР°СЃРёРІСѓ С„Р»Р°Р¶РєС–РІ
 	for (int i = 0; i < SIZE; i++) {
 		for (int j = 0; j < 9; j++) {
 			flags[i][j] = ' ';
@@ -142,11 +151,11 @@ void fullInStart() {
 }
 void fullIn() {
 
-	// генерування mines:
-	// 1. міни
+	// РіРµРЅРµСЂСѓРІР°РЅРЅСЏ mines:
+	// 1. РјС–РЅРё
 	for (int i = 0; i < MINES_NUM; i++) {
 		for (;;) {
-			// * - міни
+			// * - РјС–РЅРё
 			int index_i = rand() % 9;
 			int index_j = rand() % 9;
 			if (mines[index_i][index_j] != '*' && pos_i != index_i && pos_j != index_j && pos_i + 1 != index_i && pos_i - 1 != index_i && pos_j + 1 != index_j && pos_j - 1 != index_j) {
@@ -158,19 +167,19 @@ void fullIn() {
 			}
 		}
 	}
-	// 2. клітинки біля мін
+	// 2. РєР»С–С‚РёРЅРєРё Р±С–Р»СЏ РјС–РЅ
 	for (int i = 0; i < SIZE; i++) {
 		for (int j = 0; j < SIZE; j++) {
-			int mines_num = 0; // к-сть мін навколо клітинки
-							   // перевірка не супер гарна, but
+			int mines_num = 0; // Рє-СЃС‚СЊ РјС–РЅ РЅР°РІРєРѕР»Рѕ РєР»С–С‚РёРЅРєРё
+							   // РїРµСЂРµРІС–СЂРєР° РЅРµ СЃСѓРїРµСЂ РіР°СЂРЅР°, but
 			if (mines[i][j] != '*') {
-				if (i != (SIZE - 1) && mines[i + 1][j] == '*') { // справа
+				if (i != (SIZE - 1) && mines[i + 1][j] == '*') { // СЃРїСЂР°РІР°
 					mines_num++;
 				}
-				if (i != 0 && mines[i - 1][j] == '*') { // зліва
+				if (i != 0 && mines[i - 1][j] == '*') { // Р·Р»С–РІР°
 					mines_num++;
 				}
-				if (j != (SIZE - 1) && mines[i][j + 1] == '*') { // і т. д
+				if (j != (SIZE - 1) && mines[i][j + 1] == '*') { // С– С‚. Рґ
 					mines_num++;
 				}
 				if (j != 0 && mines[i][j - 1] == '*') {
@@ -234,7 +243,7 @@ void fullIn() {
 
 
 }
-void SetColor(int a, int b) { // функція для встановлення кольору при виводі на екран
+void SetColor(int a, int b) { // С„СѓРЅРєС†С–СЏ РґР»СЏ РІСЃС‚Р°РЅРѕРІР»РµРЅРЅСЏ РєРѕР»СЊРѕСЂСѓ РїСЂРё РІРёРІРѕРґС– РЅР° РµРєСЂР°РЅ
 	switch (mns[a][b]) {
 	case '1': {
 		SetConsoleTextAttribute(hConsoleHandle, 9);
@@ -314,7 +323,7 @@ void CoutField() {
 		cout << "\n\n   ! " << flags_num;
 	SetConsoleTextAttribute(hConsoleHandle, 15);
 }
-void CoutFieldX() { // справа від ігрового поля поле з усіма відкритими клітинками
+void CoutFieldX() { // СЃРїСЂР°РІР° РІС–Рґ С–РіСЂРѕРІРѕРіРѕ РїРѕР»СЏ РїРѕР»Рµ Р· СѓСЃС–РјР° РІС–РґРєСЂРёС‚РёРјРё РєР»С–С‚РёРЅРєР°РјРё (РґРѕРґР°С‚РєРѕРІР° С„СѓРЅРєС†С–СЏ)
 	SetConsoleTextAttribute(hConsoleHandle, 8);
 	cout << "   0 1 2 3 4 5 6 7 8 9" << endl;
 	for (int i = 0; i < SIZE; i++) {
@@ -379,14 +388,14 @@ void CoutAll() {
 		cout << "\n\n   ! " << flags_num;
 	SetConsoleTextAttribute(hConsoleHandle, 15);
 }
-void YouLose() {
+void YouLose() { // С„СѓРЅРєС†С–СЏ РїСЂРё РїСЂРѕРіСЂР°С€С–
 	mciSendString("close mp3", NULL, 0, NULL);
 	PlaySound(".\\use\\FGBS(40).wav", NULL, SND_ASYNC);
 	CoutAll();
 	cout << "\tYOU LOSE" << endl;
 	Sleep(3000);
 	cout << "\n\n> go to menu" << endl;
-	while (1) {
+	while (1) { // С‡РµРєР°С”, РїРѕРєРё РєРѕСЂРёСЃС‚СѓРІР°С‡ РЅР°С‚РёСЃРЅРµ РµРЅС‚РµСЂ
 		char push = _getch();
 		int push_int = static_cast<int>(push);
 		if (push == 13) {
@@ -395,14 +404,14 @@ void YouLose() {
 		}
 	}
 }
-void YouWin() {
+void YouWin() { // С„СѓРЅРєС†С–СЏ РїСЂРё РІРёРіСЂР°С€С–
 	mciSendString("close mp3", NULL, 0, NULL);
 	PlaySound(".\\use\\FGBS(40).wav", NULL, SND_ASYNC);
 	CoutAll();
 	cout << "\tYOU WIN" << endl;
 	Sleep(3000);
 	cout << "\n\n> go to menu" << endl;
-	while (1) {
+	while (1) {// С‡РµРєР°С”, РїРѕРєРё РєРѕСЂРёСЃС‚СѓРІР°С‡ РЅР°С‚РёСЃРЅРµ РµРЅС‚РµСЂ
 		char push = _getch();
 		int push_int = static_cast<int>(push);
 		if (push == 13) {
@@ -411,15 +420,15 @@ void YouWin() {
 		}
 	}
 }
-void Empty(int a, int b) { // функція, яка відкриває 8 клітинок навколо пустих клітинок
+void Empty(int a, int b) { // С„СѓРЅРєС†С–СЏ, СЏРєР° РІС–РґРєСЂРёРІР°С” 8 РєР»С–С‚РёРЅРѕРє РЅР°РІРєРѕР»Рѕ РїСѓСЃС‚РёС… РєР»С–С‚РёРЅРѕРє
 	mns[a][b] = mines[a][b];
-	if (a > 0 && mns[a - 1][b] == 'x') { // якщо клітинка зліва закрита
+	if (a > 0 && mns[a - 1][b] == 'x') { // СЏРєС‰Рѕ РєР»С–С‚РёРЅРєР° Р·Р»С–РІР° Р·Р°РєСЂРёС‚Р°
 		mns[a - 1][b] = mines[a - 1][b];
-		if (mines[a - 1][b] == '.') { // якщо клітинка зліва пуста
-			Empty(a - 1, b); // потрібно відкрити 8 клітинок навколо неї
+		if (mines[a - 1][b] == '.') { // СЏРєС‰Рѕ РєР»С–С‚РёРЅРєР° Р·Р»С–РІР° РїСѓСЃС‚Р°
+			Empty(a - 1, b); // РїРѕС‚СЂС–Р±РЅРѕ РІС–РґРєСЂРёС‚Рё 8 РєР»С–С‚РёРЅРѕРє РЅР°РІРєРѕР»Рѕ РЅРµС—
 		}
 	}
-	// і так далі
+	// С– С‚Р°Рє РґР°Р»С–
 	if (b > 0 && mns[a][b - 1] == 'x') {
 		mns[a][b - 1] = mines[a][b - 1];
 		if (mines[a][b - 1] == '.') {
@@ -465,7 +474,7 @@ void Empty(int a, int b) { // функція, яка відкриває 8 клітинок навколо пустих к
 
 
 }
-void OpenField(int aa, int bb) { // відкриває клітинки
+void OpenField(int aa, int bb) { // РІС–РґРєСЂРёРІР°С” РєР»С–С‚РёРЅРєРё
 
 
 	if (mines[aa][bb] == '*') {
@@ -479,19 +488,19 @@ void OpenField(int aa, int bb) { // відкриває клітинки
 	}
 
 }
-void Flags() { // функція для виставлення флажків
-	if (mns[pos_i][pos_j] == 'x') { // якщо клітинка закрита
-		if (flags[pos_i][pos_j] == '!') { // якщо флажок вже є, забираємо його
+void Flags() { // С„СѓРЅРєС†С–СЏ РґР»СЏ РІРёСЃС‚Р°РІР»РµРЅРЅСЏ С„Р»Р°Р¶РєС–РІ
+	if (mns[pos_i][pos_j] == 'x') { // СЏРєС‰Рѕ РєР»С–С‚РёРЅРєР° Р·Р°РєСЂРёС‚Р°
+		if (flags[pos_i][pos_j] == '!') { // СЏРєС‰Рѕ С„Р»Р°Р¶РѕРє РІР¶Рµ С”, Р·Р°Р±РёСЂР°С”РјРѕ Р№РѕРіРѕ
 			flags[pos_i][pos_j] = ' ';
 			flags_num++;
 		}
 		else {
-			flags[pos_i][pos_j] = '!'; // якщо немає, ставимо
+			flags[pos_i][pos_j] = '!'; // СЏРєС‰Рѕ РЅРµРјР°С”, СЃС‚Р°РІРёРјРѕ
 			flags_num--;
 		}
 	}
 }
-bool CheckWin() { // перевірка, чи ми виграли
+bool CheckWin() { // РїРµСЂРµРІС–СЂРєР°, С‡Рё РјРё РІРёРіСЂР°Р»Рё
 	int unopened = ((SIZE)*(SIZE));
 	for (int i = 0; i < SIZE; i++) {
 		for (int j = 0; j < SIZE; j++) {
@@ -502,25 +511,25 @@ bool CheckWin() { // перевірка, чи ми виграли
 		}
 	}
 
-	if (unopened == (MINES_NUM)) // якщо к-сть відкритих клітинок співпадає з к-стю мін
+	if (unopened == (MINES_NUM)) // СЏРєС‰Рѕ Рє-СЃС‚СЊ РІС–РґРєСЂРёС‚РёС… РєР»С–С‚РёРЅРѕРє СЃРїС–РІРїР°РґР°С” Р· Рє-СЃС‚СЋ РјС–РЅ
 		return true;
 	else
 		return false;
 }
 
-void Game() { // функція, що відповідає за ігрове поле
+void Game() { // С„СѓРЅРєС†С–СЏ, С‰Рѕ РІС–РґРїРѕРІС–РґР°С” Р·Р° С–РіСЂРѕРІРµ РїРѕР»Рµ
 	bool first_push = true;
 	flags_num = (MINES_NUM);
 	mciSendString("open \"use\\18_Carat_Affair_Modus_Operandi.mp3\" type mpegvideo alias mp3", NULL, 0, NULL);
 	mciSendString("play mp3 from 0", NULL, 0, NULL);
-	char push; // змінні для зчитування клавіш
+	char push; // Р·РјС–РЅРЅС– РґР»СЏ Р·С‡РёС‚СѓРІР°РЅРЅСЏ РєР»Р°РІС–С€
 	int push_int;
 	fullInStart();
 	while (1)
 	{
 		setcur(0, 0);
 		CoutField();
-		push = _getch(); // зчитування клавіш
+		push = _getch(); // Р·С‡РёС‚СѓРІР°РЅРЅСЏ РєР»Р°РІС–С€
 		PlaySound(".\\use\\ButtonMove1.wav", NULL, SND_ASYNC);
 		push_int = static_cast<int>(push);
 
@@ -535,7 +544,7 @@ void Game() { // функція, що відповідає за ігрове поле
 			}
 			break;
 		}
-		case 32: { // пробіл
+		case 32: { // РїСЂРѕР±С–Р»
 			if (first_push == true) {
 				fullIn();
 				first_push = false;
@@ -591,13 +600,13 @@ void Game() { // функція, що відповідає за ігрове поле
 			break;
 		}
 		}
-		if (CheckWin() == true) { // перевірка на виграш
+		if (CheckWin() == true) { // РїРµСЂРµРІС–СЂРєР° РЅР° РІРёРіСЂР°С€
 			YouWin();
 		}
 	}
 }
 
-void checkKey() { // перевірка кодів клавіш
+void checkKey() { // РїРµСЂРµРІС–СЂРєР° РєРѕРґС–РІ РєР»Р°РІС–С€
 	char push;
 	int push_int;
 	while (1)
