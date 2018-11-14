@@ -1,0 +1,4 @@
+﻿  kursova.cpp
+f:\files\программирование\kursova2\kursova2\kursova.cpp(615): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
+  kursova2.vcxproj -> F:\files\программирование\kursova2\Debug\kursova2.exe
+  kursova2.vcxproj -> F:\files\программирование\kursova2\Debug\kursova2.pdb (Partial PDB)

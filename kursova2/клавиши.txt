@@ -1,0 +1,7 @@
+enter - 13
+x - 120
+esc - 27
+left - 75
+right - 77
+up - 72
+down - 80
