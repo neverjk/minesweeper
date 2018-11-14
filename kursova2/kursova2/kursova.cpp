@@ -290,7 +290,7 @@ void SetColor(int a, int b) { // функція для встановлення 
 		SetConsoleTextAttribute(hConsoleHandle, 2);
 	}
 }
-void CoutField() {
+void CoutField() { // вивід поля на екран
 	SetConsoleTextAttribute(hConsoleHandle, 8);
 	cout << "\n\n\n";
 	for (int i = 0; i < SIZE; i++) {
@@ -299,10 +299,10 @@ void CoutField() {
 		for (int j = 0; j < SIZE; j++) {
 			SetConsoleTextAttribute(hConsoleHandle, 8);
 			SetColor(i, j);
-			if (i == pos_i && j == pos_j) {
+			if (i == pos_i && j == pos_j) { // положення в грі
 				SetConsoleTextAttribute(hConsoleHandle, 15);
 			}
-			if (flags[i][j] == '!') {
+			if (flags[i][j] == '!') { // флажки
 				SetConsoleTextAttribute(hConsoleHandle, 4);
 				if (i == pos_i && j == pos_j) {
 					SetConsoleTextAttribute(hConsoleHandle, 15);
@@ -366,7 +366,7 @@ void CoutFieldX() { // справа від ігрового поля поле з
 		cout << "\n\n   ! " << flags_num;
 	SetConsoleTextAttribute(hConsoleHandle, 15);
 }
-void CoutAll() {
+void CoutAll() { // вивід при програші
 	system("cls");
 	SetConsoleTextAttribute(hConsoleHandle, 8);
 	cout << "\n\n\n";
@@ -606,7 +606,7 @@ void Game() { // функція, що відповідає за ігрове п�
 	}
 }
 
-void checkKey() { // перевірка кодів клавіш
+void checkKey() { // перевірка кодів клавіш (не використовується в грі)
 	char push;
 	int push_int;
 	while (1)
